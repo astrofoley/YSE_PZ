@@ -1,0 +1,24 @@
+{% extends 'YSE_App/survey/survey_base.html' %}
+{% load static %}
+{% load dashboard_extras %}
+{% load widget_tweaks %}
+{% load render_table from django_tables2 %}
+{% load bootstrap3 %}
+
+{% block content_header %}
+    <h1>
+        Young Supernova Experiment
+        <p>Contact Information</p>
+    </h1>
+{% endblock %}
+
+{% block content %}
+    
+	<iframe src="{% static 'YSE_External_Scientists.pdf' %}" width="100%" height="500px">
+    </iframe>
+  
+{% endblock %}
+
+{% block scripts %}
+
+{% endblock %}

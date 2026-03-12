@@ -1,0 +1,115 @@
+{% extends 'YSE_App/base.html' %}
+{% load static %}
+{% load dashboard_extras %}
+{% load widget_tweaks %}
+{% load render_table from django_tables2 %}
+{% load bootstrap3 %}
+{% load el_pagination_tags %}
+
+{% block styles %}
+  <!-- include Aladin Lite CSS file in the head section of your page -->
+  <link rel="stylesheet" href="//aladin.u-strasbg.fr/AladinLite/api/v2/latest/aladin.min.css" />
+  <link rel="stylesheet" href="{% static 'YSE_App/bower_components/select2/dist/css/select2.min.css' %}">
+  <link rel="stylesheet" href="{% static 'YSE_App/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css' %}">
+  <link rel="stylesheet" href="{% static 'YSE_App/bower_components/bootstrap-daterangepicker/daterangepicker.css' %}">
+{% endblock %}
+
+{% block content_header %}
+    <h1>
+        Young Supernova Experiment
+        <small>Dashboard</small>
+    </h1>
+    <ol class="breadcrumb">
+        <li><i class="fa fa-dashboard"></i> Home</li>
+    </ol>
+{% endblock %}
+
+{% block content %}
+<div class="box-body">
+    <div class="row">
+        <div class="col-xs-3">
+          <div class="box box-default">
+            <div class="box-header with-border">
+              <h3>Sort By Ascending</h3>
+            </div>
+            <div class="box-body">
+          <!--<div class="col-xs-6">-->
+            <div class="form-group">
+              <a class="btn btn-block btn-primary" href="?sort=name">Name</a>
+              <a class="btn btn-block btn-primary" href="?sort=ra">RA</a>
+              <a class="btn btn-block btn-primary" href="?sort=dec">Dec</a>
+              <a class="btn btn-block btn-primary" href="?sort=disc_date">Disc. Date</a>
+              <a class="btn btn-block btn-primary" href="?sort=last_mag">Last Mag</a>
+              <a class="btn btn-block btn-primary" href="?sort=last_obs_date">Last Obs. Date</a>
+              <a class="btn btn-block btn-primary" href="?sort=mw_ebv">MW E(B-V)</a>
+              <a class="btn btn-block btn-primary" href="?sort=obs_group__name">Obs. Group</a>
+              <a class="btn btn-block btn-primary" href="?sort=best_spec_class__name">Spec. Class.</a>
+              <a class="btn btn-block btn-primary" href="?sort=redshift">Redshift</a>
+              <a class="btn btn-block btn-primary" href="?sort=point_source_probability">PS Score</a>
+              <a class="btn btn-block btn-primary" href="?sort=status">Status</a>
+            </div>
+      <!--</div>-->
+          </div>
+      </div>
+    </div>
+    <div class="col-xs-3">
+          <div class="box box-default">
+            <div class="box-header with-border">
+              <h3>Sort By Descending</h3>
+            </div>
+            <div class="box-body">
+          <!--<div class="col-xs-6">-->
+            <div class="form-group">
+              <a class="btn btn-block btn-primary" href="?sort=-name">Name</a>
+              <a class="btn btn-block btn-primary" href="?sort=-ra">RA</a>
+              <a class="btn btn-block btn-primary" href="?sort=-dec">Dec</a>
+              <a class="btn btn-block btn-primary" href="?sort=-disc_date">Disc. Date</a>
+              <a class="btn btn-block btn-primary" href="?sort=-last_mag">Last Mag</a>
+              <a class="btn btn-block btn-primary" href="?sort=-last_obs_date">Last Obs. Date</a>
+              <a class="btn btn-block btn-primary" href="?sort=-mw_ebv">MW E(B-V)</a>
+              <a class="btn btn-block btn-primary" href="?sort=-obs_group__name">Obs. Group</a>
+              <a class="btn btn-block btn-primary" href="?sort=-best_spec_class__name">Spec. Class.</a>
+              <a class="btn btn-block btn-primary" href="?sort=-redshift">Redshift</a>
+              <a class="btn btn-block btn-primary" href="?sort=-point_source_probability">PS Score</a>
+              <a class="btn btn-block btn-primary" href="?sort=-status">Status</a>
+            </div>
+      <!--</div>-->
+          </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+  <!-- Default box -->
+  {% include page_template %}
+    <!-- /.box-footer-->
+  </div>
+  <!-- /.box -->
+
+{% endblock %}
+
+{% block scripts %}
+
+    {{ block.super }}
+    <script src="http://code.jquery.com/jquery-latest.js"></script>
+    <script src="{{ STATIC_URL }}el-pagination/js/el-pagination.js"></script>
+    <script type='text/javascript'>
+        $.endlessPaginate({
+            paginateOnScroll: true,
+            //paginateOnScrollChunkSize: 2,
+            //paginateOnScrollMargin: 1
+        });
+    </script>
+
+<script type="text/javascript" src="//aladin.u-strasbg.fr/AladinLite/api/v2/latest/aladin.min.js" charset="utf-8"></script>
+
+<script type='text/javascript'>
+
+{% if anchor %}
+$(document).ready(function(){
+    window.location = '#{{ anchor }}'
+});
+{% endif %}
+    
+</script>
+{% endblock %}

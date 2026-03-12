@@ -1,0 +1,593 @@
+{% extends 'YSE_App/base.html' %}
+{% load transient_detail_extras %}
+{% load dashboard_extras %}
+{% load render_table from django_tables2 %}
+{% load bootstrap3 %}
+{% load static %}
+
+{% block content %}
+
+<!-- Content Header (Page header) -->
+    <section class="content-header">
+      <h1>
+        YSE Survey Home
+      </h1>
+      <ol class="breadcrumb">
+        <li><i class="fa fa-dashboard"></i> Home</li>
+      </ol>
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+
+  <div class="row">
+    <div class="col-xs-12">
+      <div class="box">
+      <!-- Default box -->
+          <div class="box-header with-border"> <!--id="{{followup_table.2}}">-->
+          <h3 class="box-title">Current YSE Fields</h3>
+          <div class="box-body">
+            <img src="{% url 'view_yse_fields' %}">
+          </div>
+          <div class="box-footer"></div>
+        </div>
+        <div class="box-header with-border"> <!--id="{{followup_table.2}}">-->
+          <h3 class="box-title">Tonight's Fields</h3>
+          <div class="box-body">
+            <table id="YSE_fields_tonight" class="table table-bordered">
+            <thead>
+              <tr>
+                <th>Field</th>
+                <th>RA</th>
+                <th>Dec</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for f in survey_fields_tonight %}
+                <tr>
+                    <td>{{ f.field_id }}</td>
+                    <td>{{ f.CoordString.0 }}</td>
+                    <td>{{ f.CoordString.1 }}</td>
+                </tr>
+              {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          <div class="box-footer"></div>
+        </div>
+          <div class="box-header with-border"> <!--id="{{followup_table.2}}">-->
+          <h3 class="box-title">Last Night's Fields</h3>
+          <div class="box-body">
+            <table id="YSE_fields_lastnight" class="table table-bordered">
+            <thead>
+              <tr>
+                <th>Field</th>
+                <th>RA</th>
+                <th>Dec</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for f in survey_fields_last_night %}
+                <tr>
+                    <td>{{ f.field_id }}</td>
+                    <td>{{ f.CoordString.0 }}</td>
+                    <td>{{ f.CoordString.1 }}</td>
+                </tr>
+              {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          <div class="box-footer"></div>
+        </div>
+        <div class="box-header with-border"> <!--id="{{followup_table.2}}">-->
+          <h3 class="box-title">Next Telescope Nights</h3>
+          <div class="box-body">
+            {% if upcoming_observing_nights %}
+            <table id="classical_resources" class="table table-bordered">
+            <thead>
+              <tr>
+                <th>Telescope</th>
+                <th>Night</th>  
+                <th>PI</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for n in upcoming_observing_nights %}
+              {% if n.telescope.name != 'Swope' %}
+                <tr>
+                    <td>{{ n.telescope }}</td>
+                    <td>{{ n.begin_date_valid }}</td>
+                    <td>{{ n.principal_investigator }}</td>
+                </tr>
+                {% endif %}
+              {% endfor %}
+              </tbody>
+            </table>
+            {% else %}
+              No upcoming observing nights
+            {% endif %}
+            </div>
+            <div class="box-footer">
+              <div class="row">
+                <div class="col-xs-12">
+                  {% include "YSE_App/form_snippets/classical_resource_form.html" with form=classical_resource_form %}
+                </div>
+               </div>
+            </div>
+            <div class="box-header with-border">
+            <h3 class="box-title">ToO Resources</h3>
+            {% if too_resources %}
+            <table id="too_resources" class="table table-bordered">
+            <thead>
+              <tr>
+                <th>Telescope</th>
+                <th type='numeric'>ToO Hours</th>
+                <th>PI</th>  
+              </tr>
+            </thead>
+            <tbody>
+              {% for t in too_resources %}
+                <tr>
+                    <td>{{ t.telescope }}</td>
+                    <td id="delta_too_hours_{{t.id}}"></td>
+                    <td>{{ t.principal_investigator }}</td>
+                </tr>
+              {% endfor %}
+              </tbody>
+            </table>
+            {% else %}
+              No upcoming observing nights
+            {% endif %}
+          </div>
+          <div class="box-footer"></div>
+            <div class="row">
+              <div class="col-xs-12">
+                {% include "YSE_App/form_snippets/too_resource_form.html" with form=too_resource_form %}
+              </div>
+            </div>
+        </div>
+        <div class="box-header with-border" id="{{transient_table.1}}"> <!--id="{{followup_table.2}}">-->
+          <h3 class="box-title">Latest Transients</h3><span style="float:right;"><a href="{% url 'transient_summary' 'YSE_Transients' %}"><h3 class="box-title">Summary View</h3></a></span>
+          <!--<p style="text-align:left;margin:0;padding:0;"><h3 class="box-title">{{ transient_table.2 }}</h3><span style="float:right;"><a href="{% url 'transient_summary' transient_table.2 %}"><h3 class="box-title">Summary View</h3></a></span></p>-->
+          </div>
+          <div align='right'>
+            {% if transient_table.2 %}
+          <form action="" method="get" class="form form-inline">
+          {% bootstrap_form transient_table.2.form layout='inline' %}
+          {% with "#"|add:transient_table.1 as link %}
+          {% bootstrap_button 'filter' %}&ensp;&nbsp;
+          {% endwith %}
+          </form>
+          {% endif %}
+        </div>
+        <div class="box-body">
+          {% render_table transient_table.0 %}
+
+        </div>
+    <!-- /.box-body -->
+    <div class="box-footer">
+    </div>
+    <div class="box-header with-border" id="{{transient_follow_table.1}}"> <!--id="{{followup_table.2}}">-->
+          <h3 class="box-title">Transients with Followup Requested</h3><span style="float:right;"><a href="{% url 'transient_summary' 'YSE_Transients_ToFollow' %}"><h3 class="box-title">Summary View</h3></a></span>
+          <!--<p style="text-align:left;margin:0;padding:0;"><h3 class="box-title">{{ transient_table.2 }}</h3><span style="float:right;"><a href="{% url 'transient_summary' transient_table.2 %}"><h3 class="box-title">Summary View</h3></a></span></p>-->
+          </div>
+          <div align='right'>
+            {% if transient_follow_table.2 %}
+          <form action="" method="get" class="form form-inline">
+          {% bootstrap_form transient_follow_table.2.form layout='inline' %}
+          {% with "#"|add:transient_follow_table.1 as link %}
+          {% bootstrap_button 'filter' %}&ensp;&nbsp;
+          {% endwith %}
+          </form>
+          {% endif %}
+        </div>
+        <div class="box-body">
+          {% render_table transient_follow_table.0 %}
+
+        </div>
+    <!-- /.box-body -->
+    <div class="box-footer">
+    </div>
+    <!-- /.box-footer-->
+      <div class="box-header with-border" id="{{transient_rising_table.1}}"> <!--id="{{followup_table.2}}">-->
+          <h3 class="box-title">Rising Transients</h3>
+          <!--<p style="text-align:left;margin:0;padding:0;"><h3 class="box-title">{{ transient_table.2 }}</h3><span style="float:right;"><a href="{% url 'transient_summary' transient_table.2 %}"><h3 class="box-title">Summary View</h3></a></span></p>-->
+          </div>
+          <div align='right'>
+            {% if transient_rising_table.2 %}
+          <form action="" method="get" class="form form-inline">
+          {% bootstrap_form transient_rising_table.2.form layout='inline' %}
+          {% with "#"|add:transient_rising_table.1 as link %}
+          {% bootstrap_button 'filter' %}&ensp;&nbsp;
+          {% endwith %}
+          </form>
+          {% endif %}
+        </div>
+        <div class="box-body">
+          {% render_table transient_rising_table.0 %}
+
+        </div>
+    <!-- /.box-body -->
+    <div class="box-footer">
+    </div>
+
+    <div class="box-footer">
+    </div>
+    <!-- /.box-footer-->
+      <div class="box-header with-border" id="{{transient_fastrising_table.1}}"> <!--id="{{followup_table.2}}">-->
+          <h3 class="box-title">Transients Rising Over 0.5 Mag/Day</h3>
+          <!--<p style="text-align:left;margin:0;padding:0;"><h3 class="box-title">{{ transient_table.2 }}</h3><span style="float:right;"><a href="{% url 'transient_summary' transient_table.2 %}"><h3 class="box-title">Summary View</h3></a></span></p>-->
+          </div>
+          <div align='right'>
+            {% if transient_fastrising_table.2 %}
+          <form action="" method="get" class="form form-inline">
+          {% bootstrap_form transient_fastrising_table.2.form layout='inline' %}
+          {% with "#"|add:transient_fastrising_table.1 as link %}
+          {% bootstrap_button 'filter' %}&ensp;&nbsp;
+          {% endwith %}
+          </form>
+          {% endif %}
+        </div>
+        <div class="box-body">
+          {% render_table transient_fastrising_table.0 %}
+
+        </div>
+    <!-- /.box-body -->
+    <div class="box-footer">
+    </div>
+        <div class="box-header with-border" id="{{ztf_transient_table.1}}"> <!--id="{{followup_table.2}}">-->
+          <h3 class="box-title">ZTF Transients In/Near YSE Fields</h3><span style="float:right;"><a href="{% url 'transient_summary' 'ZTF_YSE_Transients' %}"><h3 class="box-title">Summary View</h3></a></span>
+          <!--<p style="text-align:left;margin:0;padding:0;"><h3 class="box-title">{{ transient_table.2 }}</h3><span style="float:right;"><a href="{% url 'transient_summary' transient_table.2 %}"><h3 class="box-title">Summary View</h3></a></span></p>-->
+          </div>
+          <div align='right'>
+            {% if ztf_transient_table.2 %}
+          <form action="" method="get" class="form form-inline">
+          {% bootstrap_form ztf_transient_table.2.form layout='inline' %}
+          {% with "#"|add:ztf_transient_table.1 as link %}
+          {% bootstrap_button 'filter' %}&ensp;&nbsp;
+          {% endwith %}
+          </form>
+          {% endif %}
+        </div>
+        <div class="box-body">
+          {% render_table ztf_transient_table.0 %}
+
+        </div>
+    <!-- /.box-body -->
+    <div class="box-footer">
+    </div>
+    <!-- /.box-footer-->
+  </div>
+    <!-- /.box-body -->
+  </div>
+    <div class="row">
+    <div class="col-xs-12">
+  <div class="box">
+  <div class="box-header with-border"> <!--id="{{followup_table.2}}">-->
+          <h3 class="box-title">Currently On-Call</h3>
+          <div class="box-body">
+            {% if on_call_observers %}
+            <table id="oncall_observer_tbl" class="table table-bordered">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Email</th>  
+              </tr>
+            </thead>
+            <tbody>
+              {% for on_call in on_call_observers %}
+                {% for u in on_call.user.all %}
+                <tr>
+                  <td>{{ u.first_name }} {{u.last_name}}</td>
+                  <td>{{ u.email }}</td>
+                </tr>
+                {% endfor %}
+              {% endfor %}
+              </tbody>
+            </table>
+            {% else %}
+              No observers on call today
+            {% endif %}
+          <div class='row'>
+            <div class="col-xs-8">
+              <!--<input type="hidden" id="survey_field" value=""/>-->
+              {% include "YSE_App/form_snippets/oncall_form.html" with form=oncall_form %}
+            </div>
+          </div>
+          </div>
+          <div class="box-footer"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+    <!-- /.box-footer-->
+  
+  <!-- /.box -->
+    
+{% endblock %}
+
+
+{% block scripts %}
+  <script src="{% static 'YSE_App/bower_components/datatables.net/js/jquery.dataTables.min.js' %}"></script>
+  <script src="{% static 'YSE_App/bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js' %}"></script>
+  <!--<script type="text/javascript" src="https://mpld3.github.io/js/d3.v3.min.js"></script>
+  <script type="text/javascript" src="https://mpld3.github.io/js/mpld3.v0.3.1.dev1.js"></script>-->
+  <script type="text/javascript" src="{% static 'YSE_App/bokeh-2.4.2.min.js' %}"></script>
+  <script src="{% static 'YSE_App/bower_components/bootstrap-timepicker/js/bootstrap-timepicker.js' %}"></script>
+
+  <script>
+    $( document ).ready(function(){
+        {% for too_resource in too_resources %}
+          {% if too_resource.used_too_hours < too_resource.awarded_too_hours %}
+
+              $.get("{% url 'delta_too_hours' too_resource.id %}").done(function(json){
+                  var rows = $("#delta_too_hours_{{too_resource.id}}")
+                  $(rows).append(json["delta_too_hours"])
+              });
+          {% endif %}
+        {% endfor %}
+      window.location = '#{{ anchor }}'
+
+    $('#YSE_fields_tonight').DataTable();
+    $('#YSE_fields_lastnight').DataTable();
+    $('#classical_resources').DataTable();
+    $('#too_resources').DataTable();
+    $('.dataTables_length').addClass('bs-select');
+  });
+  $(function () {
+
+      // too resource
+      $('#too_resource_date_range').daterangepicker({ 
+        timePicker24Hour: true,
+        timePicker: true, 
+        timePickerIncrement: 1, 
+        format: 'YYYY-MM-DD HH:mm', 
+        locale: {
+          format: 'YYYY-MM-DD HH:mm'
+        } 
+      });
+
+      // Initialize daterange
+      fdr_picker = $('#too_resource_date_range').data('daterangepicker')
+      $('#begin_date_valid').val(fdr_picker.startDate.format("YYYY-MM-DD HH:mm:00"))
+      $('#end_date_valid').val(fdr_picker.endDate.format("YYYY-MM-DD HH:mm:00"))
+      $('#too_resource_date_range').on('apply.daterangepicker', function(ev, picker) {
+        $('#begin_date_valid').val(picker.startDate.format("YYYY-MM-DD HH:mm:00"))
+        $('#end_date_valid').val(picker.endDate.format("YYYY-MM-DD HH:mm:00"))
+      });
+
+      // classical resource
+      $('#observing_date').datepicker({ 
+        timePicker24Hour: true,
+        timePicker: true,
+        timePickerIncrement: 1,
+        format: 'mm/dd/yyyy',
+        //todayBtn: "linked",
+        locale: {
+          format: 'mm/dd/yyyy'
+        } 
+      });
+
+      // on-call date range
+      $('#oncall_date_range').daterangepicker({ 
+        timePicker24Hour: true,
+        timePicker: true, 
+        timePickerIncrement: 1, 
+        startDate: '{{date_start}} 00:00',
+        endDate:'{{date_end}} 00:00',
+        format: 'YYYY-MM-DD HH:mm', 
+        locale: {
+          format: 'YYYY-MM-DD HH:mm'
+        } 
+      });
+
+      // Initialize daterange
+      fdr_picker = $('#oncall_date_range').data('daterangepicker')
+      $('#valid_start').val(fdr_picker.startDate.format("YYYY-MM-DD HH:mm:00"))
+      $('#valid_stop').val(fdr_picker.endDate.format("YYYY-MM-DD HH:mm:00"))
+      $('#oncall_date_range').on('apply.daterangepicker', function(ev, picker) {
+        $('#valid_start').val(picker.startDate.format("YYYY-MM-DD HH:mm:00"))
+        $('#valid_stop').val(picker.endDate.format("YYYY-MM-DD HH:mm:00"))
+      });
+
+      // Submit post on submit
+      $('#add_oncall_observer').on('submit', function(event){
+        event.preventDefault();
+        add_oncall_observer();
+      });
+
+      function add_oncall_observer() {
+        // Grab the form, and associate it with the current transient detail page
+        var data = $('#add_oncall_observer').serialize()
+        //var transient_id = $('#transient_pk').val()
+        //data = (data + "&transient=" + transient_id)
+
+        $.ajax({
+          url : "{% url 'add_oncall_observer' %}", // the endpoint
+          type : "POST", // http method
+          data : data, // data sent with the post request
+
+          // handle a successful response
+          success : function(json) {
+            
+            // Required fields
+
+              // Re-initialize the datepicker
+              location.reload();
+          },
+
+          // handle a non-successful response
+          error : function(xhr,errmsg,err) {
+            alert(xhr.status + ": " + xhr.responseText);
+          }
+          });
+        }
+
+      // classical resource
+      $('#add_classical_resource').on('submit', function(event){
+        event.preventDefault();
+        add_classical_resource();
+      });
+
+      function add_classical_resource() {
+        // Grab the form, and associate it with the current transient detail page
+        var data = $('#add_classical_resource').serialize()
+        //var transient_id = $('#transient_pk').val()
+        //data = (data + "&transient=" + transient_id)
+
+        $.ajax({
+          url : "{% url 'add_classical_resource' %}", // the endpoint
+          type : "POST", // http method
+          data : data, // data sent with the post request
+
+          // handle a successful response
+          success : function(json) {
+            
+            // Required fields
+              location.reload();
+          },
+
+          // handle a non-successful response
+          error : function(xhr,errmsg,err) {
+            alert(xhr.status + ": " + xhr.responseText);
+          }
+          });
+        }
+
+// classical resource
+      $('#add_too_resource').on('submit', function(event){
+        event.preventDefault();
+        add_too_resource();
+      });
+
+      function add_too_resource() {
+        // Grab the form, and associate it with the current transient detail page
+        var data = $('#add_too_resource').serialize()
+        //var transient_id = $('#transient_pk').val()
+        //data = (data + "&transient=" + transient_id)
+
+        $.ajax({
+          url : "{% url 'add_too_resource' %}", // the endpoint
+          type : "POST", // http method
+          data : data, // data sent with the post request
+
+          // handle a successful response
+          success : function(json) {
+            
+            // Required fields
+              location.reload();
+          },
+
+          // handle a non-successful response
+          error : function(xhr,errmsg,err) {
+            alert(xhr.status + ": " + xhr.responseText);
+          }
+          });
+        }
+
+      function transientStatusChangeErr() {
+        alert("Transient Status may not have changed -- please use YSE Admin and contact Dave C or David J.")
+      }
+
+      $('.transientStatusChange').on('click', function(event){
+        var status_id = $(this).attr('data-status_id')
+        var transient_id = $(this).attr('transient_id')
+        var url_target = "{% url 'transient-detail' -1 %}".replace('-1', transient_id);
+        var status_target = "{% url 'transientstatus-list' %}" + status_id + "/"
+
+        var base_url = window.location.protocol + "//" + window.location.hostname
+        var port = window.location.port
+        var api_url = base_url + url_target
+        var status_url = base_url + status_target
+
+        if (port != "") {
+          api_url = base_url + ":" + port + url_target
+          status_url = base_url + ":" + port + status_target
+        }
+
+        var putData = { "status": status_url }
+
+        $.ajax({
+          type: "PATCH",
+          url: api_url,
+          csrfmiddlewaretoken: "{{ csrf_token }}",
+          data: putData,
+          success: function(data, textStatus, jqXHR) {
+            if (jqXHR.status == 200 && textStatus == "success") {
+
+              var tokens = data.status.split("/")
+              var status_name = tokens[tokens.length-2]
+              var button_id = "#"+transient_id+"_status_name"
+              $(button_id).text(status_name)
+              var second_button_id = "#"+transient_id+"_status_name_yse"
+              $(second_button_id).text(status_name)
+
+              {#alert(textStatus)#}
+            } else {
+              transientStatusChangeErr()
+            }
+          },
+          error: function(XMLHttpRequest, textStatus, errorThrown) {
+            transientStatusChangeErr()
+            {#alert("Error: " + String(errorThrown) + String(textStatus) + String(XMLHttpRequest.responseText));#}
+          }
+        });
+        event.preventDefault();
+      });
+
+      // This function gets cookie with a given name
+      function getCookie(name) {
+        var cookieValue = null;
+        if (document.cookie && document.cookie != '') {
+          var cookies = document.cookie.split(';');
+          for (var i = 0; i < cookies.length; i++) {
+            var cookie = jQuery.trim(cookies[i]);
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) == (name + '=')) {
+              cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+              break;
+            }
+          }
+        }
+        return cookieValue;
+      }
+
+      var csrftoken = getCookie('csrftoken');
+
+      /*
+      The functions below will create a header with csrftoken
+      */
+
+      function csrfSafeMethod(method) {
+        // these HTTP methods do not require CSRF protection
+        return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+      }
+
+      function sameOrigin(url) {
+        // test that a given url is a same-origin URL
+        // url could be relative or scheme relative or absolute
+        var host = document.location.host; // host + port
+        var protocol = document.location.protocol;
+        var sr_origin = '//' + host;
+        var origin = protocol + sr_origin;
+        // Allow absolute or scheme relative URLs to same origin
+        return (url == origin || url.slice(0, origin.length + 1) == origin + '/') ||
+        (url == sr_origin || url.slice(0, sr_origin.length + 1) == sr_origin + '/') ||
+          // or any other URL that isn't scheme relative or absolute i.e relative.
+          !(/^(\/\/|http:|https:).*/.test(url));
+        }
+
+        $.ajaxSetup({
+          beforeSend: function(xhr, settings) {
+            if (!csrfSafeMethod(settings.type) && sameOrigin(settings.url)) {
+            // Send the token to same-origin, relative URLs only.
+            // Send the token only if the method warrants CSRF protection
+            // Using the CSRFToken value acquired earlier
+            xhr.setRequestHeader("X-CSRFToken", csrftoken);
+          }
+        }
+      });
+    });
+
+</script>
+{% endblock %}
