@@ -1,0 +1,73 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master, develop, astrofoley-patch-1]
+  pull_request:
+    branches: [main, master, develop]
+
+jobs:
+  docker-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure application settings
+        run: cp YSE_PZ/public_settings.ini YSE_PZ/settings.ini
+
+      - name: Write docker compose environment
+        working-directory: docker
+        run: |
+          cat > .env <<EOF
+          VOL=${{ github.workspace }}
+          VOL_DB=${{ github.workspace }}/database
+          VOL_DB_LOG=${{ github.workspace }}/database_logs
+          VOL_GHOST=${{ github.workspace }}/ghost_logs
+          STATIC_VOL=${{ github.workspace }}/YSE_PZ/static
+          DB_PWD=password
+          LOCAL_DB_PORT=53306
+          LOCAL_HTTP_PORT=8080
+          DJANGO_SUPERUSER_USERNAME=ci_admin
+          DJANGO_SUPERUSER_PASSWORD=ci_password
+          DJANGO_SUPERUSER_EMAIL=ci@example.com
+          EOF
+
+      - name: Start database and web services
+        working-directory: docker
+        run: docker compose up -d yse_db web
+
+      - name: Wait for MySQL
+        run: |
+          for i in $(seq 1 60); do
+            if docker exec ysepz_db_container mysqladmin ping -h localhost -ppassword --silent; then
+              exit 0
+            fi
+            sleep 5
+          done
+          echo "MySQL did not become ready in time"
+          exit 1
+
+      - name: Wait for Gunicorn
+        run: |
+          for i in $(seq 1 60); do
+            if curl -fsS http://localhost:8000/login/ >/dev/null; then
+              exit 0
+            fi
+            sleep 5
+          done
+          echo "Web service did not become ready in time"
+          docker logs ysepz_web_container || true
+          exit 1
+
+      - name: Django system check
+        run: docker exec ysepz_web_container python3 manage.py check
+
+      - name: Run tests
+        run: docker exec ysepz_web_container python3 manage.py test YSE_App.tests --verbosity=2
+
+      - name: Tear down
+        if: always()
+        working-directory: docker
+        run: docker compose down -v

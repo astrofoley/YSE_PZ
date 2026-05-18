@@ -19,9 +19,9 @@ from django.http import HttpResponse, HttpResponseRedirect, Http404, JsonRespons
 def select_yse_fields(request):
 
     all_yse_gpc1_fields = SurveyFieldMSB.objects.filter(Q(survey_fields__obs_group__name='YSE') & Q(survey_fields__instrument__name='GPC1')).prefetch_related('survey_fields').distinct().order_by('name')
-    active_yse_gpc1_fields = yse_gpc1_fields.filter(active=True)distinct().order_by('name')
+    active_yse_gpc1_fields = all_yse_gpc1_fields.filter(active=True).distinct().order_by('name')
     all_yse_gpc2_fields = SurveyFieldMSB.objects.filter(Q(survey_fields__obs_group__name='YSE') & Q(survey_fields__instrument__name='GPC2')).prefetch_related('survey_fields').distinct().order_by('name')
-    active_yse_gpc2_fields = yse_gpc2_fields.filter(active=True)distinct().order_by('name')
+    active_yse_gpc2_fields = all_yse_gpc2_fields.filter(active=True).distinct().order_by('name')
 
     active_gpc1_names = active_yse_gpc1_fields.values_list('name',flat=True)
     active_gpc2_names = active_yse_gpc2_fields.values_list('name',flat=True)

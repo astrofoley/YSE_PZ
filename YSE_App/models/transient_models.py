@@ -91,6 +91,8 @@ class Transient(BaseModel):
 		return '%.7f'%(self.dec)
 
 	def Separation(self):
+		if not self.host_id:
+			return None
 		host = Host.objects.get(pk=self.host_id)
 		return '%.2f'%getSeparation(self.ra,self.dec,host.ra,host.dec)
 

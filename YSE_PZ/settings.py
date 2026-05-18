@@ -82,7 +82,7 @@ CRON_CLASSES = [
 	'YSE_App.data_ingest.TNS_uploads.TNS_recent',
 	'YSE_App.data_ingest.TNS_uploads.TNS_recent_realtime',
     'YSE_App.data_ingest.QUB_data.CheckDuplicates',
-    'YSE_App.data_ingest.PhotometryUploadExample.PhotometryUploads'
+    'YSE_App.data_ingest.PhotometryUploadExample.PhotometryUploads',
     'YSE_App.data_ingest.ZTF_Forced_Phot_Cron.ForcedPhot',
     'YSE_App.data_ingest.TNS_uploads.UpdateGHOST'
 ]
@@ -97,7 +97,6 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     #'django.middleware.cache.UpdateCacheMiddleware',
-    'django.middleware.common.CommonMiddleware',
     'auditlog.middleware.AuditlogMiddleware',
     #'django.middleware.cache.FetchFromCacheMiddleware'
 ]
