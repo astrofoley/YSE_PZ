@@ -3,7 +3,7 @@ import time
 from slackclient import SlackClient
 import TNS_Synopsis
 
-# constants
+# constants — set SLACK_BOT_TOKEN in the environment (never commit tokens)
 SLACK_BOT_TOKEN = os.environ.get("SLACK_BOT_TOKEN", "")
 BOT_NAME = "tns_update"
 BOT_ID = "U3L8R6HUK"
