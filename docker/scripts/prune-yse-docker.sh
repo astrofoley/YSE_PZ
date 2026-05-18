@@ -34,7 +34,6 @@ images_in_use() {
   echo "$ids" | sort -u | grep -v '^$' || true
 }
 
-IN_USE
 IN_USE="$(images_in_use)"
 
 image_in_use() {

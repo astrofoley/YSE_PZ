@@ -40,6 +40,12 @@ services:
         - ${VOL_GHOST}:/app/ghost_logs
       environment:
         MYSQL_ROOT_PASSWORD: ${DB_PWD}
+      healthcheck:
+        test: ["CMD-SHELL", "mysqladmin ping -h localhost -uroot -p$$MYSQL_ROOT_PASSWORD --silent"]
+        interval: 5s
+        timeout: 20s
+        retries: 10
+        start_period: 60s
     yse_nginx:
       container_name: ysepz_web_nginx_container
       image: "nginx:1.21-alpine"

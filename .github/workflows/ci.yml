@@ -20,23 +20,29 @@ jobs:
       - name: Write docker compose environment
         working-directory: docker
         run: |
-          cat > .env <<EOF
-          VOL=${{ github.workspace }}
-          VOL_DB=${{ github.workspace }}/database
-          VOL_DB_LOG=${{ github.workspace }}/database_logs
-          VOL_GHOST=${{ github.workspace }}/ghost_logs
-          STATIC_VOL=${{ github.workspace }}/YSE_PZ/static
-          DB_PWD=password
-          LOCAL_DB_PORT=53306
-          LOCAL_HTTP_PORT=8080
-          DJANGO_SUPERUSER_USERNAME=ci_admin
-          DJANGO_SUPERUSER_PASSWORD=ci_password
-          DJANGO_SUPERUSER_EMAIL=ci@example.com
-          EOF
+          printf '%s\n' \
+            "VOL=${{ github.workspace }}" \
+            "VOL_DB=${{ github.workspace }}/database" \
+            "VOL_DB_LOG=${{ github.workspace }}/database_logs" \
+            "VOL_GHOST=${{ github.workspace }}/ghost_logs" \
+            "STATIC_VOL=${{ github.workspace }}/YSE_PZ/static" \
+            "DB_PWD=password" \
+            "LOCAL_DB_PORT=53306" \
+            "LOCAL_HTTP_PORT=8080" \
+            "DJANGO_SUPERUSER_USERNAME=ci_admin" \
+            "DJANGO_SUPERUSER_PASSWORD=ci_password" \
+            "DJANGO_SUPERUSER_EMAIL=ci@example.com" \
+            > .env
+          grep -q '^VOL=' .env
+          ! grep -q '^[[:space:]]' .env
 
       - name: Start database and web services
         working-directory: docker
-        run: docker compose up -d yse_db web
+        run: |
+          docker compose up -d yse_db web || {
+            docker logs ysepz_db_container 2>&1 || true
+            exit 1
+          }
 
       - name: Wait for MySQL
         run: |
@@ -72,4 +78,5 @@ jobs:
         working-directory: docker
         run: |
           docker compose down -v
+          bash -n scripts/prune-yse-docker.sh
           bash scripts/prune-yse-docker.sh aggressive
