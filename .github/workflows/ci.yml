@@ -67,7 +67,9 @@ jobs:
       - name: Run tests
         run: docker exec ysepz_web_container python3 manage.py test YSE_App.tests --verbosity=2
 
-      - name: Tear down
+      - name: Tear down and prune Docker artifacts
         if: always()
         working-directory: docker
-        run: docker compose down -v
+        run: |
+          docker compose down -v
+          bash scripts/prune-yse-docker.sh aggressive

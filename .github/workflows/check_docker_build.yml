@@ -25,3 +25,6 @@ jobs:
           file: ./docker/Dockerfile.web.dev
           cache-from: type=gha
           cache-to: type=gha,mode=max
+      - name: Prune local build artifacts
+        if: always()
+        run: bash docker/scripts/prune-yse-docker.sh aggressive
