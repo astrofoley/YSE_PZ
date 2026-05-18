@@ -23,7 +23,6 @@ jobs:
           printf '%s\n' \
             "VOL=${{ github.workspace }}" \
             "VOL_DB=${{ github.workspace }}/database" \
-            "VOL_DB_LOG=${{ github.workspace }}/database_logs" \
             "VOL_GHOST=${{ github.workspace }}/ghost_logs" \
             "STATIC_VOL=${{ github.workspace }}/YSE_PZ/static" \
             "DB_PWD=password" \
