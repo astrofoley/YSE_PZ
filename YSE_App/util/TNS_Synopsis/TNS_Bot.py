@@ -3,8 +3,8 @@ import time
 from slackclient import SlackClient
 import TNS_Synopsis
 
-# constants
-SLACK_BOT_TOKEN = os.environ.get("YSE_SLACK_BOT_TOKEN")
+# constants — set SLACK_BOT_TOKEN in the environment (never commit tokens)
+SLACK_BOT_TOKEN = os.environ.get("SLACK_BOT_TOKEN", "")
 BOT_NAME = "tns_update"
 BOT_ID = "U3L8R6HUK"
 AT_BOT = "<@" + BOT_ID + ">"
@@ -91,9 +91,6 @@ def parse_slack_output(slack_rtm_output):
 
 if __name__ == "__main__":
 	# execute only if run as a script
-	if not SLACK_BOT_TOKEN:
-		raise RuntimeError("Set YSE_SLACK_BOT_TOKEN before starting the TNS bot.")
-
 	slack_client = SlackClient(SLACK_BOT_TOKEN)
 
 	if slack_client.rtm_connect():

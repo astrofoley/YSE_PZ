@@ -16,12 +16,6 @@ services:
         - "8000:8000"
         environment:
           CONDA_DEFAULT_ENV: base
-          _: /opt/conda/bin/python
-          CONDA_EXE: /opt/conda/bin/conda
-          SHLVL: 1
-          CONDA_PYTHON_EXE: /opt/conda/bin/python
-          CONDA_SHLVL: 1
-          CONDA_PROMPT_MODIFIER: (base)
           PROJ_LIB: /opt/conda/share/proj
           CONDA_PREFIX: /opt/conda
           DB_CONFIG: /opt/project/db_configuration
